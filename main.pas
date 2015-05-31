@@ -1,5 +1,7 @@
 Program PolishNotation;
 
+Uses Crt;
+
 Type
 	Point = ^Data;
 	Data = Record
@@ -96,9 +98,10 @@ Begin
 	Stack := Nil;
 End;
 
-Procedure InitializePostfix(Var Postfix: PointPostfix);
+Procedure InitializePostfix(Var First, Last: PointPostfix);
 Begin
-	Postfix := Nil;
+	First := Nil;
+	Last := Nil;
 End;
 
 Procedure Push(Var Stack: Point; Elemen: String);
@@ -196,7 +199,7 @@ Begin
 	Push(Stack, '(');
 	Infix := Infix + ')';
 	P := '';
-	Writeln('Q : ',Infix);
+	WriteLn('Q : ',Infix);
 	For i := 1 To Length(Infix) Do
 	Begin
 		Case Infix[i] Of
@@ -269,7 +272,7 @@ Procedure InputInfix(Var Infix: String);
 Begin
 	Repeat
 		Write('Masukkan notasi infix : ');
-		Readln(Infix);
+		ReadLn(Infix);
 	Until Validation(Infix);
 End;
 
@@ -297,7 +300,7 @@ Begin
 			'X', 'Y', 
 			'Z', 'A' : Begin
 						Write('Masukkan angka untuk ', Postfix[i], ' : ');
-						Readln(x);
+						ReadLn(x);
 						AddNodeInLast(ExpressionPFirst, ExpressionPLast, '', x);
 					   End;
 			Else
@@ -386,33 +389,42 @@ Begin
 			Write(', ');
 		Transversal := Transversal^.Next;
 	End;
-	Writeln;
+	WriteLn;
+End;
+
+Procedure InputAndConvertInfix(Var Infix, Postfix: String);
+Begin
+	InputInfix(Infix);
+	ConvertInfixToPostfix(Infix, Postfix);
+	WriteLn('P : ', Postfix);
+End;
+
+Procedure ConvertAndCalculate(Postfix: String);
+
+Var
+	PostfixFirst, PostfixLast: PointPostfix;
+	Total: Real;
+
+Begin
+	InitializePostfix(PostfixFirst, PostfixLast);
+	ConvertAlphabeticToNumeric(Postfix, PostfixFirst, PostfixLast);
+	ShowPostfixNumeric(PostfixFirst);
+	Calculate(PostfixFirst, PostfixLast, Total);
+	Write('Hasil : ', Total:0:2);
 End;
 
 Procedure Main();
 
 Var
 	Infix, Postfix: String;
-	PostfixFirst, PostfixLast: PointPostfix;
-	Total: Real;
 
 Begin
-	{ Input Infix }
-	InputInfix(Infix);
-	{ Convert Infix to Postfix }
-	ConvertInfixToPostfix(Infix, Postfix);
-	Writeln('P : ', Postfix);
-	{ Memasukkan nilai pada setiap huruf di notasi infix }
-	InitializePostfix(PostfixFirst);
-	InitializePostfix(PostfixLast);
-	ConvertAlphabeticToNumeric(Postfix, PostfixFirst, PostfixLast);
-	ShowPostfixNumeric(PostfixFirst);
-	{ Menghitung hasil dari notasi postfix }
-	Calculate(PostfixFirst, PostfixLast, Total);
-	Write('Hasil : ', Total:0:2);
+	InputAndConvertInfix(Infix, Postfix);
+	ConvertAndCalculate(Postfix);
 End;
 
 Begin
+	ClrScr;
 	Main();
-	Readln;
+	ReadLn;
 End.
