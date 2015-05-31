@@ -1,46 +1,44 @@
-program InfixToPostfix;
+Program PolishNotation;
 
-type
+Type
 	Point = ^Data;
 	Data = Record
-		Character : String;
-		Number : Real;
-		Next : Point;
-	end;
+		Character: String;
+		Number: Real;
+		Next: Point;
+	End;
 
 	PointPostfix = ^DataPostfix;
 	DataPostfix = Record
-		TOperator : String;
-		TOperand : Real;
-		Next : PointPostfix;
+		TOperator: String;
+		TOperand: Real;
+		Next: PointPostfix;
 	End;
 
-	TString = array[1..255] of Char;
+Function Validation(Infix: String): Boolean;
 
-function Validation(Infix : String) : Boolean;
-
-var
+Var
 	i, Wrong, FoundOperator, FoundDoubleOperand, FoundDoubleOperator: Integer;
 
-begin
+Begin
 	Wrong := 0;
 	FoundOperator := 0;
 	FoundDoubleOperand := 0;
 	FoundDoubleOperator := 0;
-	for i := 1 to Length(Infix) do
-	begin
-		case Infix[i] of
+	For i := 1 To Length(Infix) Do
+	Begin
+		Case Infix[i] Of
 			'(', ')' : FoundOperator := FoundOperator + 1;
 			'+', '-', 
 			'*', '/', 
-			'^'       : begin
+			'^'       : Begin
 							FoundOperator := FoundOperator + 1;
-							case Infix[i + 1] of
+							Case Infix[i + 1] Of
 								'+', '-', 
 								'*', '/', 
 								'^'       : FoundDoubleOperator := FoundDoubleOperator + 1;
-							end;
-						end;
+							End;
+						End;
 			'B', 'C', 
 			'D', 'E', 
 			'F', 'G', 
@@ -53,8 +51,8 @@ begin
 			'T', 'U', 
 			'V', 'W', 
 			'X', 'Y', 
-			'Z', 'A' : begin
-							case Infix[i + 1] of
+			'Z', 'A' : Begin
+							Case Infix[i + 1] Of
 								'B', 'C', 
 								'D', 'E', 
 								'F', 'G', 
@@ -68,170 +66,140 @@ begin
 								'V', 'W', 
 								'X', 'Y', 
 								'Z', 'A' : FoundDoubleOperand := FoundDoubleOperand + 1;
-							end;
-					   end;
-			else 
-			begin
-				If (Infix[i] <> ' ') Then
-					Wrong := Wrong + 1;
-			end;
-		end;
-	end;
+							End;
+					   End;
+			Else
+				Wrong := Wrong + 1;
+		End;
+	End;
 	Validation := True;
 	If (Wrong > 0) Or (FoundOperator < 5) Or (FoundDoubleOperand > 0) Or (FoundDoubleOperator > 0) Then
 		Validation := False;
-end;
+End;
 
-function IsEmpty(Stack : Point): Boolean;
-begin
+Function IsEmpty(Stack: Point): Boolean;
+Begin
 	IsEmpty := False;
-	If (Stack = nil) Then
+	If (Stack = Nil) Then
 		IsEmpty := True;
-end;
+End;
 
-function OneNode(Stack : Point): Boolean;
-begin
+Function OneNode(Stack: Point): Boolean;
+Begin
 	OneNode := False;
-	If (Stack^.Next = nil) Then
+	If (Stack^.Next = Nil) Then
 		OneNode := True;
-end;
+End;
 
-function Exponent(x, y : Integer): Real;
+Procedure Initialize(Var Stack: Point);
+Begin
+	Stack := Nil;
+End;
 
-var
-	i: Integer;
+Procedure InitializePostfix(Var Postfix: PointPostfix);
+Begin
+	Postfix := Nil;
+End;
 
-begin
-	Exponent := 1;
-	for i := 1 to y do
-	begin
-		Exponent := Exponent * x;
-	end;
-end;
+Procedure Push(Var Stack: Point; Elemen: String);
 
-procedure Initialize(var Stack : Point);
-
-begin
-	Stack := nil;
-end;
-
-procedure InitializePostfix(var Postfix : PointPostfix);
-
-begin
-	Postfix := nil;
-end;
-
-procedure InitializeArray(var ArrayValue : TString);
-
-var
-	i: Integer;
-
-begin
-	for i := 1 to 255 do
-	begin
-		ArrayValue[i] := ' ';
-	end;
-end;
-
-procedure Push(var Stack : Point; Elemen : String);
-
-var
+Var
 	Node: Point;
 
-begin
+Begin
 	New(Node);
 	Node^.Character := Elemen;
 	Node^.Next := Stack;
 	Stack := Node;
-end;
+End;
 
-procedure PushNumber(var Stack : Point; Elemen : Real);
+Procedure PushNumber(Var Stack: Point; Elemen: Real);
 
-var
+Var
 	Node: Point;
 
-begin
+Begin
 	New(Node);
 	Node^.Number := Elemen;
 	Node^.Next := Stack;
 	Stack := Node;
-end;
+End;
 
-procedure Pop(var Stack : Point; var Elemen : String);
+Procedure Pop(Var Stack: Point; Var Elemen: String);
 
-var
+Var
 	Node: Point;
 
-begin
+Begin
 	Node := Stack;
 	Elemen := Node^.Character;
-	if (not OneNode(Stack)) then
-	begin
+	If (Not OneNode(Stack)) Then
+	Begin
 		Stack := Stack^.Next;
-	end
-	else
-	begin
-		Stack := nil;
-	end;
+	End
+	Else
+	Begin
+		Stack := Nil;
+	End;
 	Dispose(Node);
-end;
+End;
 
-procedure PopNumber(var Stack : Point; var Elemen : Real);
+Procedure PopNumber(Var Stack: Point; Var Elemen: Real);
 
-var
+Var
 	Node: Point;
 
-begin
+Begin
 	Node := Stack;
 	Elemen := Node^.Number;
-	if (not OneNode(Stack)) then
-	begin
+	If (not OneNode(Stack)) Then
+	Begin
 		Stack := Stack^.Next;
-	end
-	else
-	begin
-		Stack := nil;
-	end;
+	End
+	Else
+	Begin
+		Stack := Nil;
+	End;
 	Dispose(Node);
-end;
+End;
 
-procedure AddNodeInLast(var FirstList, LastList : PointPostfix; TOperator : String; TOperand : Real);
+Procedure AddNodeInLast(Var FirstList, LastList: PointPostfix; TOperator: String; TOperand: Real);
 
-var
+Var
 	Node: PointPostfix;
 
-begin
+Begin
 	New(Node);
 	Node^.TOperand := TOperand;
 	Node^.TOperator := TOperator;
-	If (FirstList = nil) Then
-	begin
+	If (FirstList = Nil) Then
+	Begin
 		FirstList := Node;
-	end
-	else
-	begin
+	End
+	Else
+	Begin
 		LastList^.Next := Node;
-	end;
+	End;
 	LastList := Node;
-end;
+End;
 
-procedure ConvertInfixToPostfix(Infix : String; var Postfix : String);
+Procedure ConvertInfixToPostfix(Infix: String; Var Postfix: String);
 
-var
+Var
 	i: Integer;
 	Stack: Point;
-	LastCharacter : String;
-	P : String;
+	LastCharacter: String;
+	P: String;
 
-begin
+Begin
 	Initialize(Stack);
 	Push(Stack, '(');
 	Infix := Infix + ')';
 	P := '';
 	Writeln('Q : ',Infix);
-	for i := 1 to Length(Infix) do
-	begin
-		case Infix[i] of
+	For i := 1 To Length(Infix) Do
+	Begin
+		Case Infix[i] Of
 			'B', 'C', 
 			'D', 'E', 
 			'F', 'G', 
@@ -248,76 +216,73 @@ begin
 			'('      : Push(Stack, Infix[i]);						{ KURUNG BUKA KETEMU }
 			'+', '-', 
 			'*', '/', 
-			'^'       : begin 										{ OPERATOR KETEMU }
-							case Infix[i] of
+			'^'       : Begin 										{ OPERATOR KETEMU }
+							Case Infix[i] Of
 								'^': Push(Stack, Infix[i]);
 								'*',
-								'/': begin
-										while (Stack^.Character <> '(')	do
-										begin
-											case Stack^.Character of
+								'/': Begin
+										While (Stack^.Character <> '(')	Do
+										Begin
+											Case Stack^.Character Of
 												'^',
 												'*',
-												'/' : begin
-															Pop(Stack, LastCharacter);
-															P := P + LastCharacter;
-														end;
-											end;
-										end;
+												'/' : Begin
+														Pop(Stack, LastCharacter);
+														P := P + LastCharacter;
+													  End;
+											End;
+										End;
 										Push(Stack, Infix[i]);
-									 end;
+									 End;
 								'+',
-								'-': begin
-										while (Stack^.Character <> '(')	do
-										begin
-											case Stack^.Character of
-												'^',
-												'*',
-												'/',
-												'+',
-												'-' : begin
+								'-': Begin
+										While (Stack^.Character <> '(')	Do
+										Begin
+											Case Stack^.Character Of
+												'^', '*',
+												'/', '+',
+												'-' 	: Begin
 															Pop(Stack, LastCharacter);
 															P := P + LastCharacter;
-														end;
-											end;
-										end;
+														  End;
+											End;
+										End;
 										Push(Stack, Infix[i]);
-									 end;
-							end;
-						end;
-			')' : begin
-					while (Stack^.Character <> '(')	do
-					begin
+									 End;
+							End;
+						End;
+			')' : Begin
+					While (Stack^.Character <> '(')	Do
+					Begin
 						Pop(Stack, LastCharacter);
 						P := P + LastCharacter;
-					end;
-					if (i <> Length(Infix)) Then
+					End;
+					If (i <> Length(Infix)) Then
 						Pop(Stack, LastCharacter);
-				  end;
-		end;
-	end;
+				  End;
+		End;
+	End;
 	Postfix := P;
-	Writeln('P : ',Postfix);
 end;
 
-procedure InputInfix(var Infix : String);
-begin
+Procedure InputInfix(Var Infix: String);
+Begin
 	Repeat
 		Write('Masukkan notasi infix : ');
 		Readln(Infix);
 	Until Validation(Infix);
-end;
+End;
 
-procedure ConvertAlphabeticToNumeric(Postfix : String; var ExpressionPFirst, ExpressionPLast : PointPostfix);
+Procedure ConvertAlphabeticToNumeric(Postfix: String; Var ExpressionPFirst, ExpressionPLast: PointPostfix);
 
-var
-	x : Real;
-	i : Integer;
+Var
+	x: Real;
+	i: Integer;
 
-begin
-	for i := 1 to Length(Postfix) do
-	begin
-		case Postfix[i] of
+Begin
+	For i := 1 To Length(Postfix) Do
+	Begin
+		Case Postfix[i] Of
 			'B', 'C', 
 			'D', 'E', 
 			'F', 'G', 
@@ -330,85 +295,85 @@ begin
 			'T', 'U', 
 			'V', 'W', 
 			'X', 'Y', 
-			'Z', 'A' : begin
+			'Z', 'A' : Begin
 						Write('Masukkan angka untuk ', Postfix[i], ' : ');
 						Readln(x);
 						AddNodeInLast(ExpressionPFirst, ExpressionPLast, '', x);
-					   end;
-			else
-					AddNodeInLast(ExpressionPFirst, ExpressionPLast, Postfix[i], 0);
-		end;
-	end;
-end;
+					   End;
+			Else
+				AddNodeInLast(ExpressionPFirst, ExpressionPLast, Postfix[i], 0);
+		End;
+	End;
+End;
 
-procedure Calculate(PostfixFirst, PostfixLast : PointPostfix; var Result : Real);
+Procedure Calculate(PostfixFirst, PostfixLast: PointPostfix; Var Result: Real);
 
-var
-	Stack : Point;
+Var
+	Stack: Point;
 	Operand1, Operand2, Total: Real;
-	Transversal : PointPostfix;
+	Transversal: PointPostfix;
 	
-begin
+Begin
 	Initialize(Stack);
 	AddNodeInLast(PostfixFirst, PostfixLast, ')', 0);
 	Transversal := PostfixFirst;
-	While (Transversal^.TOperator <> ')') do
-	begin
+	While (Transversal^.TOperator <> ')') Do
+	Begin
 		If 	(Transversal^.TOperator = '-') Then
-		begin
+		Begin
 			PopNumber(Stack, Operand2);
 			PopNumber(Stack, Operand1);
 			Total := Operand1 - Operand2;
 			PushNumber(Stack, Total);
-		end
+		End
 		Else If (Transversal^.TOperator = '+') Then
-		begin
+		Begin
 			PopNumber(Stack, Operand2);
 			PopNumber(Stack, Operand1);
 			Total := Operand1 + Operand2;
 			PushNumber(Stack, Total);
-		end
+		End
 		Else If (Transversal^.TOperator = '/') Then
-		begin
+		Begin
 			PopNumber(Stack, Operand2);
 			PopNumber(Stack, Operand1);
 			Total := Operand1 / Operand2;
 			PushNumber(Stack, Total);
-		end
+		End
 		Else If (Transversal^.TOperator = '*') Then
-		begin
+		Begin
 			PopNumber(Stack, Operand2);
 			PopNumber(Stack, Operand1);
 			Total := Operand1 * Operand2;
 			PushNumber(Stack, Total);
-		end
+		End
 		Else If (Transversal^.TOperator = '^') Then
-		begin
+		Begin
 			PopNumber(Stack, Operand2);
 			PopNumber(Stack, Operand1);
 			Total := Exp(Operand2*Ln(Operand1)); 
 			{Fungsi exponen diatas ada pada pascal, silakan gunakan cara lain jika menggunakan bahasa pemrograman lain}
 			PushNumber(Stack, Total);
-		end
+		End
 		else
-		begin
+		Begin
 			PushNumber(Stack, Transversal^.TOperand);
-		end;
+		End;
 		Transversal := Transversal^.Next;
-	end;
+	End;
 	PopNumber(Stack, Result);
-end;
+End;
 
-procedure ShowPostfixNumeric(PostfixFirst : PointPostfix);
+Procedure ShowPostfixNumeric(PostfixFirst: PointPostfix);
 
-var
+Var
 	Transversal: PointPostfix;
 
-begin
+Begin
 	Write('P (Dengan format angka) : ');
 	Transversal := PostfixFirst;
 	While (Transversal <> nil) Do
-	begin
+	Begin
 		If 	(Transversal^.TOperator = '-') Or
 			(Transversal^.TOperator = '+') Or
 			(Transversal^.TOperator = '/') Or
@@ -417,25 +382,26 @@ begin
 		 	Write(Transversal^.TOperator)
 		Else
 			Write(Transversal^.TOperand:0:0);
-		If (Transversal^.Next <> nil) Then
+		If (Transversal^.Next <> Nil) Then
 			Write(', ');
 		Transversal := Transversal^.Next;
-	end;
+	End;
 	Writeln;
-end;
+End;
 
-procedure Main();
+Procedure Main();
 
-var
+Var
 	Infix, Postfix: String;
 	PostfixFirst, PostfixLast: PointPostfix;
-	Total : Real;
+	Total: Real;
 
-begin
+Begin
 	{ Input Infix }
 	InputInfix(Infix);
 	{ Convert Infix to Postfix }
 	ConvertInfixToPostfix(Infix, Postfix);
+	Writeln('P : ', Postfix);
 	{ Memasukkan nilai pada setiap huruf di notasi infix }
 	InitializePostfix(PostfixFirst);
 	InitializePostfix(PostfixLast);
@@ -444,9 +410,9 @@ begin
 	{ Menghitung hasil dari notasi postfix }
 	Calculate(PostfixFirst, PostfixLast, Total);
 	Write('Hasil : ', Total:0:2);
-end;
+End;
 
-begin
+Begin
 	Main();
 	Readln;
-end.
+End.
