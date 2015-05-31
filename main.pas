@@ -1,4 +1,6 @@
 Program PolishNotation;
+{I.S.: User memasukkan notasi infix}
+{I.F.: Menghasilkan notasi postfix yang sudah diberi nilai dan dihitung}
 
 Uses Crt;
 
@@ -18,6 +20,8 @@ Type
 	End;
 
 Function Validation(Infix: String): Boolean;
+{I.S.: Var. Infix sudah terdefinisikan}
+{I.F.: Menghasilkan hasil benar/true jika validasi berhasil}
 
 Var
 	i, Wrong, FoundOperator, FoundDoubleOperand, FoundDoubleOperator: Integer;
@@ -80,6 +84,9 @@ Begin
 End;
 
 Function IsEmpty(Stack: Point): Boolean;
+{I.S.: Var. Stack sudah terdefinisikan}
+{I.F.: Menghasilkan hasil benar/true jika Stack bernilai Nil/Null}
+
 Begin
 	IsEmpty := False;
 	If (Stack = Nil) Then
@@ -87,6 +94,9 @@ Begin
 End;
 
 Function OneNode(Stack: Point): Boolean;
+{I.S.: Var. Stack sudah terdefinisikan}
+{I.F.: Menghasilkan hasil benar/true jika simpul setelah Stack bernilai Nil/Null}
+
 Begin
 	OneNode := False;
 	If (Stack^.Next = Nil) Then
@@ -94,17 +104,25 @@ Begin
 End;
 
 Procedure Initialize(Var Stack: Point);
+{I.S.: Var. Stack sudah terdefinisikan}
+{I.F.: Memberi nilai Nil/Null pada Stack}
+
 Begin
 	Stack := Nil;
 End;
 
 Procedure InitializePostfix(Var First, Last: PointPostfix);
+{I.S.: Var. First dan Last sudah terdefinisikan}
+{I.F.: Memberi nilai Nil/Null pada First dan Last}
+
 Begin
 	First := Nil;
 	Last := Nil;
 End;
 
 Procedure Push(Var Stack: Point; Elemen: String);
+{I.S.: Var. Stack dan Elemen sudah terdefinisikan}
+{I.F.: Menambahkan Elemen ke Stack}
 
 Var
 	Node: Point;
@@ -117,6 +135,8 @@ Begin
 End;
 
 Procedure PushNumber(Var Stack: Point; Elemen: Real);
+{I.S.: Var. Stack dan Elemen sudah terdefinisikan}
+{I.F.: Menambahkan Elemen ke Stack}
 
 Var
 	Node: Point;
@@ -129,6 +149,8 @@ Begin
 End;
 
 Procedure Pop(Var Stack: Point; Var Elemen: String);
+{I.S.: Var. Stack dan Elemen sudah terdefinisikan}
+{I.F.: Menghapus satu simpul dari Stack dan menyimpannya di Elemen}
 
 Var
 	Node: Point;
@@ -148,6 +170,8 @@ Begin
 End;
 
 Procedure PopNumber(Var Stack: Point; Var Elemen: Real);
+{I.S.: Var. Stack dan Elemen sudah terdefinisikan}
+{I.F.: Menghapus satu simpul dari Stack dan menyimpannya di Elemen}
 
 Var
 	Node: Point;
@@ -167,6 +191,8 @@ Begin
 End;
 
 Procedure AddNodeInLast(Var FirstList, LastList: PointPostfix; TOperator: String; TOperand: Real);
+{I.S.: Var. FirstList, LastList, TOperator dan TOperand sudah terdefinisikan}
+{I.F.: Menyisipkan TOperator dan TOperand di akhir dari simpul FirstList dan LastList}
 
 Var
 	Node: PointPostfix;
@@ -187,6 +213,8 @@ Begin
 End;
 
 Procedure ConvertInfixToPostfix(Infix: String; Var Postfix: String);
+{I.S.: Var. Infix dan Postfix sudah terdefinisikan}
+{I.F.: Mengubah notasi infix ke notasi postfix yang tersimpan di Var. Infix dan menyimpannya ke Var. Postfix}
 
 Var
 	i: Integer;
@@ -269,6 +297,9 @@ Begin
 end;
 
 Procedure InputInfix(Var Infix: String);
+{I.S.: Var. Infix sudah terdefinisikan}
+{I.F.: Menyimpan notasi infix ke Var. Infix}
+
 Begin
 	Repeat
 		Write('Masukkan notasi infix : ');
@@ -277,6 +308,8 @@ Begin
 End;
 
 Procedure ConvertAlphabeticToNumeric(Postfix: String; Var ExpressionPFirst, ExpressionPLast: PointPostfix);
+{I.S.: Var. Postfix, ExpressionPFirst dan ExpressionPLast sudah terdefinisikan}
+{I.F.: Mengubah setiap huruf menjadi angka pada notasi postfix}
 
 Var
 	x: Real;
@@ -310,6 +343,8 @@ Begin
 End;
 
 Procedure Calculate(PostfixFirst, PostfixLast: PointPostfix; Var Result: Real);
+{I.S.: Var. PostfixFirst, PostfixLast dan Result sudah terdefinisikan}
+{I.F.: Menghitung hasil dari notasi postfix}
 
 Var
 	Stack: Point;
@@ -368,6 +403,8 @@ Begin
 End;
 
 Procedure ShowPostfixNumeric(PostfixFirst: PointPostfix);
+{I.S.: Var. PostfixFirst sudah terdefinisikan}
+{I.F.: Menampilkan setiap isi dari Var. PostfixFirst}
 
 Var
 	Transversal: PointPostfix;
@@ -393,6 +430,9 @@ Begin
 End;
 
 Procedure InputAndConvertInfix(Var Infix, Postfix: String);
+{I.S.: Var. Infix dan Postfix sudah terdefinisikan}
+{I.F.: Memasukkan notasi infix dan mengubahnya menjadi notasi postfix}
+
 Begin
 	InputInfix(Infix);
 	ConvertInfixToPostfix(Infix, Postfix);
@@ -400,6 +440,8 @@ Begin
 End;
 
 Procedure ConvertAndCalculate(Postfix: String);
+{I.S.: Var. Postfix sudah terdefinisikan}
+{I.F.: Mengubah menjadi angka dari setiap huruf di Var. Postfix dan menjumlahkannya sesuai dengan operator yang ada}
 
 Var
 	PostfixFirst, PostfixLast: PointPostfix;
@@ -414,6 +456,8 @@ Begin
 End;
 
 Procedure Main();
+{I.S.: Sembarang}
+{I.F.: Mengubah notasi infix ke notasi postfix dan menjumlahkannya}
 
 Var
 	Infix, Postfix: String;
