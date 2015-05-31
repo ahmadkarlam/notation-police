@@ -155,7 +155,7 @@ Var
 Begin
 	Node := Stack;
 	Elemen := Node^.Number;
-	If (not OneNode(Stack)) Then
+	If (Not OneNode(Stack)) Then
 	Begin
 		Stack := Stack^.Next;
 	End
