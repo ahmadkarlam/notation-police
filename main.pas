@@ -19,10 +19,6 @@ type
 
 	TString = array[1..255] of Char;
 
-var
-	Contoh: String;
-	Contoh2: Char;
-
 function Validation(Infix : String) : Boolean;
 
 var
@@ -82,7 +78,6 @@ begin
 					Wrong := Wrong + 1;
 			end;
 		end;
-		Writeln(i, ' . ', ' - ', Infix[i], ' - ', Wrong);
 	end;
 	Validation := True;
 	If (Wrong > 0) Or (FoundOperator < 5) Or (FoundDoubleOperand > 0) Or (FoundDoubleOperator > 0) Then
@@ -152,6 +147,18 @@ begin
 	Stack := Node;
 end;
 
+procedure PushNumber(var Stack : Point; Elemen : Real);
+
+var
+	Node: Point;
+
+begin
+	New(Node);
+	Node^.Number := Elemen;
+	Node^.Next := Stack;
+	Stack := Node;
+end;
+
 procedure Pop(var Stack : Point; var Elemen : String);
 
 var
@@ -160,6 +167,25 @@ var
 begin
 	Node := Stack;
 	Elemen := Node^.Character;
+	if (not OneNode(Stack)) then
+	begin
+		Stack := Stack^.Next;
+	end
+	else
+	begin
+		Stack := nil;
+	end;
+	Dispose(Node);
+end;
+
+procedure PopNumber(var Stack : Point; var Elemen : Real);
+
+var
+	Node: Point;
+
+begin
+	Node := Stack;
+	Elemen := Node^.Number;
 	if (not OneNode(Stack)) then
 	begin
 		Stack := Stack^.Next;
@@ -287,7 +313,6 @@ end;
 procedure ConvertAlphabeticToNumeric(Postfix : String; var ExpressionPFirst, ExpressionPLast : PointPostfix);
 
 var
-	Stack: Point;
 	x : Real;
 	i : Integer;
 
@@ -322,74 +347,89 @@ procedure Calculate(PostfixFirst, PostfixLast : PointPostfix; var Result : Real)
 
 var
 	Stack : Point;
-	Transversal : PointPostfix;
 	Operand1, Operand2, Total: Real;
-	Operand : String;
-	Operand1Integer, Operand2Integer : Integer;
+	Transversal : PointPostfix;
 	
-
 begin
 	Initialize(Stack);
 	AddNodeInLast(PostfixFirst, PostfixLast, ')', 0);
 	Transversal := PostfixFirst;
 	While (Transversal^.TOperator <> ')') do
 	begin
-		Writeln(Stack^.Character);
 		If 	(Transversal^.TOperator = '-') Then
 		begin
-			Pop(Stack, Operand);
-			Operand2 := StrToFloat(Operand);
-			Pop(Stack, Operand);
-			Operand1 := StrToFloat(Operand);
+			PopNumber(Stack, Operand2);
+			PopNumber(Stack, Operand1);
 			Total := Operand1 - Operand2;
+			PushNumber(Stack, Total);
 		end
 		Else If (Transversal^.TOperator = '+') Then
 		begin
-			Pop(Stack, Operand);
-			Operand2 := StrToFloat(Operand);
-			Pop(Stack, Operand);
-			Operand1 := StrToFloat(Operand);
+			PopNumber(Stack, Operand2);
+			PopNumber(Stack, Operand1);
 			Total := Operand1 + Operand2;
+			PushNumber(Stack, Total);
 		end
 		Else If (Transversal^.TOperator = '/') Then
 		begin
-			Pop(Stack, Operand);
-			Operand2 := StrToFloat(Operand);
-			Pop(Stack, Operand);
-			Operand1 := StrToFloat(Operand);
+			PopNumber(Stack, Operand2);
+			PopNumber(Stack, Operand1);
 			Total := Operand1 / Operand2;
+			PushNumber(Stack, Total);
 		end
 		Else If (Transversal^.TOperator = '*') Then
 		begin
-			Pop(Stack, Operand);
-			Operand2 := StrToFloat(Operand);
-			Pop(Stack, Operand);
-			Operand1 := StrToFloat(Operand);
+			PopNumber(Stack, Operand2);
+			PopNumber(Stack, Operand1);
 			Total := Operand1 * Operand2;
+			PushNumber(Stack, Total);
 		end
 		Else If (Transversal^.TOperator = '^') Then
 		begin
-			Pop(Stack, Operand);
-			Operand2Integer := StrToInt(Operand);
-			Pop(Stack, Operand);
-			Operand1Integer := StrToInt(Operand);
-			Total := Exponent(Operand1Integer, Operand2Integer);
+			PopNumber(Stack, Operand2);
+			PopNumber(Stack, Operand1);
+			Total := Exp(Operand2*Ln(Operand1)); 
+			{Fungsi exponen diatas ada pada pascal, silakan gunakan cara lain jika menggunakan bahasa pemrograman lain}
+			PushNumber(Stack, Total);
 		end
 		else
 		begin
-			Push(Stack, FloatToStr(Transversal^.TOperand));
+			PushNumber(Stack, Transversal^.TOperand);
 		end;
+	end;
+	PopNumber(Stack, Result);
+end;
+
+procedure ShowPostfixNumeric(PostfixFirst : PointPostfix);
+
+var
+	Transversal: PointPostfix;
+
+begin
+	Write('P (Dengan format angka) : ');
+	Transversal := PostfixFirst;
+	While (Transversal <> nil) Do
+	begin
+		If 	(Transversal^.TOperator = '-') Or
+			(Transversal^.TOperator = '+') Or
+			(Transversal^.TOperator = '/') Or
+			(Transversal^.TOperator = '*') Or
+			(Transversal^.TOperator = '^') Then
+		 	Write(Transversal^.TOperator)
+		Else
+			Write(Transversal^.TOperand:0:0);
+		If (Transversal <> nil) Then
+			Write(', ');
 		Transversal := Transversal^.Next;
 	end;
-	Pop(Stack, Operand);
-	Result := StrToFloat(Operand);
+	Writeln;
 end;
 
 procedure Main();
 
 var
 	Infix, Postfix: String;
-	PostfixFirst, PostfixLast, Bantu: PointPostfix;
+	PostfixFirst, PostfixLast: PointPostfix;
 	Total : Real;
 
 begin
@@ -401,9 +441,10 @@ begin
 	InitializePostfix(PostfixFirst);
 	InitializePostfix(PostfixLast);
 	ConvertAlphabeticToNumeric(Postfix, PostfixFirst, PostfixLast);
+	ShowPostfixNumeric(PostfixFirst);
 	{ Menghitung hasil dari notasi postfix }
 	Calculate(PostfixFirst, PostfixLast, Total);
-	Writeln(Total:0:0);
+	Writeln('Hasil : ', Total:0:2);
 end;
 
 begin
