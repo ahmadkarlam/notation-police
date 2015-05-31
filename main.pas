@@ -394,6 +394,7 @@ begin
 		begin
 			PushNumber(Stack, Transversal^.TOperand);
 		end;
+		Transversal := Transversal^.Next;
 	end;
 	PopNumber(Stack, Result);
 end;
@@ -416,7 +417,7 @@ begin
 		 	Write(Transversal^.TOperator)
 		Else
 			Write(Transversal^.TOperand:0:0);
-		If (Transversal <> nil) Then
+		If (Transversal^.Next <> nil) Then
 			Write(', ');
 		Transversal := Transversal^.Next;
 	end;
@@ -442,7 +443,7 @@ begin
 	ShowPostfixNumeric(PostfixFirst);
 	{ Menghitung hasil dari notasi postfix }
 	Calculate(PostfixFirst, PostfixLast, Total);
-	Writeln('Hasil : ', Total:0:2);
+	Write('Hasil : ', Total:0:2);
 end;
 
 begin
