@@ -1,7 +1,5 @@
 program InfixToPostfix;
 
-uses sysutils;
-
 type
 	Point = ^Data;
 	Data = Record
